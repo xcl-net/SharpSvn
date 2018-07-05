@@ -14,66 +14,6 @@ namespace MySvnClient
     /// </summary>
     class Program
     {
-
-        {
-            using (SvnClient client = GetSvnClient())
-            {
-                SvnInfoEventArgs svnInfo;
-                if (client.GetInfo(new SvnUriTarget(url), out svnInfo))
-                {
-                }
-
-                if (svnInfo.LastChangeRevision == 0) return;
-
-                //client.Authentication.Clear();
-                client.Authentication.UserNamePasswordHandlers += new EventHandler<SharpSvn.Security.SvnUserNamePasswordEventArgs>(
-                delegate (Object s, SharpSvn.Security.SvnUserNamePasswordEventArgs ee)
-                {
-                    ee.UserName = "xiaochuanling";
-                    ee.Password = "xiaochuanling";
-                });
-
-                client.Authentication.SslServerTrustHandlers += new EventHandler<SharpSvn.Security.SvnSslServerTrustEventArgs>(
-                delegate (Object ssender, SharpSvn.Security.SvnSslServerTrustEventArgs se)
-                {
-                    // Look at the rest of the arguments of E whether you wish to accept
-
-                    // If accept:
-                    se.AcceptedFailures = se.Failures;
-                    se.Save = true; // Save acceptance to authentication store
-                });
-
-                var builder = new StringBuilder();
-                builder.AppendLine(DateTime.Now + "\r\n");
-                SvnLogArgs logArgs = new SvnLogArgs();
-                logArgs.Range = new SvnRevisionRange(75034, svnInfo.LastChangeRevision);
-                logArgs.RetrieveAllProperties = true;
-
-                EventHandler<SvnLogEventArgs> logHandler = new EventHandler<SvnLogEventArgs>(delegate (object lo, SvnLogEventArgs le)
-                {
-                    foreach (SvnChangeItem changeItem in le.ChangedPaths)
-                    {
-                        builder.AppendLine(string.Format(
-                                                    "{0} {1} {2} {3} {4}\r{5} {6}",
-                                                    changeItem.Action,
-                                                    changeItem.Path,
-                                                    changeItem.CopyFromRevision,
-                                                    changeItem.CopyFromPath,
-                                                    le.Author,
-                                                    le.LogMessage,
-                                                    le.Revision));
-
-                    }
-                });
-
-                //client.Log()
-                Console.WriteLine(builder);
-            }
-        } 
-        #endregion
-
-
-
         static void Main(string[] args)
         {
             var url = "仓库地址";
